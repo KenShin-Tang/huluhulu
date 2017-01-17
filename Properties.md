@@ -1,9 +1,12 @@
 ####Properties
 
-**Stored Properties** store constant and variable values as part of an instance, whereas **Computed Properties** calculate(rather than store) a value. **Computed Properties** are provided by classes, structures, and enumerations. **Stored properties** are provided onlly by classes and structures.
+**Stored Properties** 用来存储实例的常量/变量值(class, structure 才有); **Computed Properties** 计算出值(而不是存储, class structure, Enumeration 都可以有).
+
+* 我们可以定义 property observer 来监测 property 值的变化(用来响应值的变化), 它可以被添加到自定义的 stored properties或者继承自父类的 properties.
 
 **Stored Properties
 
+* 简答来说, stored property 就是 class/structure实例中存储的一个常量或者变量值.
 * 属性在定义时可以预置一个默认值, 也可以在初始化的时候设置/修改其值(constant除外).
 
 **Stored Properties of Constant Structure Instances
@@ -13,31 +16,39 @@
 **Lazy Stored Properties
 
 A lazy stored property is a property whose initial value is not calculated until the first time it is used. You indicate a lazy stored property by writing the `lazy` modifier before its declaration.
-*NOTE: You must always declare a lazy property as a variable(with the var keyword), because its initial value might not be retrieved until after intance initialization completes. Constant propertise must always have a value before initializetion completes, and therefore cannot be declared as lazy.*
+
+*NOTE: `lazy` 只能用于变量, 因为它的初值有可能在实例初始化后也不一定会有. 而常量property在初始化完成之前必须有初始值.*
 
 Lazy properties are useful when the initial value for a property is dependent on outside factors whose value are not known until after an intance's initialization is complete. Lazy properties are also useful when the initial value for a property requires complex or computationally expensive setup that should not be performed unless or until it is needed.
-*NOTE: If a property marked with the `lazy` modifier is accessed by multiple threads simultaneously and the property has not yet benn initialized, there is no guarantee that the property will be initialized only once.*
+
+*NOTE: 多线程下` lazy` 修饰的 property 默认有可能被初始化多次(即不安全)*
 
 **Stored Properties and Instance Variables**
+
+在 OC 中, 有两种方式来存储  值和引用 作为类实例的一部分.一个是 property, 一个是实例变量(用来备份存储在 property 中的值). 而 Swift 则将两者融合成一个 property 声明. Swift 的 property 没有对应的 instance variable, 且property 的backing store(值备份) is not accessed directly. 这就避免了像 OC 一样,有时用 property 访问有时用 instance variable 访问的困惑.
 
 **Computed Properties**
 In addition to stored properties, classes, structures, and enumerations can define computed properties, which *do not actually store a value. Instead, they provide a getter and and an optional setter to retrieve and set other properties and vlaue inderectly*.
 
 **Shorthand Setter Declaration**
-If a computed property's setter does not define a name for the new value to be set, a default name of `newValue` is used.
+
+computed property的 setter 默认以" newValue" 为新值的 name, 当然也可以选择性地指定.
 
 **Read-Only Computed Properties**
-    A computed property with a getter but no setter is known as a `read-only computed property`. *NOTE: You must declare computed properties - including read-only computed properties - as variable properties with the `var` keyword, because their value is not fixed. The `let` keyword is only used for constant properties, to indicate that their values cannot be changed noce they are set as part of instance initialization.*
+    A computed property with a getter but no setter is known as a `read-only computed property`.
+    
+*NOTE: computed properties 必定是变量,即以 `var`修饰, 因为它们的值不固定, 是计算出来的.*
 
-我们对于只读属性甚至可以省略`get`关键字. 
+* 我们对于只读属性甚至可以省略`get`关键字以及对应的花括号. 
 
 **Property Observers**
-Property observers observe and respond to changes in a property's value. Property observers are called every time a property's value is set, even if the new value is the same the property's current value.
 
-You can add property observers to any stored properties you define, except for lazy stored properties.
+Property observers观察并响应其 property 值的变化即便是前后 set 的是相等的值.
+
+You can add property observers to any **stored properties** you define, except for lazy stored properties.
 我们可以选择性地定义一下两个中的任意一个或同时都定义:
-* `willSet` is called just before the value is strored.
-* `didSet` is called immediately after the new value is stored.
+* `willSet` is called just before the value is strored.默认的新值名字为 newValue.
+* `didSet` is called immediately after the new value is stored. 默认老值的 name 是 oldValue.
 
 **Global and Local Variables**
 Global constants and variables are always computed lazily, in a similar manner to Lazy Stored Properties. Unlike lazy stored properties, global constants and variables do not need to be marked with the lazy modifier. Local constants and variables are never computed lazily.
@@ -49,7 +60,8 @@ Global constants and variables are always computed lazily, in a similar manner t
 
 `Type Properties` 在定义特定类型的某些属性只有一个通用的属性值的时候很有用,比如常量属性(类似的在C中的static constant)或者 一个对于所有实例来说是全局变量的变量属性(比如C中的static variable).
 
-* You must always give stored type properties a default value. This is because the type itself dose not have an initializer that can assign a value to a stored type property at initialization time.
+* Type property 必须有默认值.
+* 使用 `static`关键字标注.
 
 
 

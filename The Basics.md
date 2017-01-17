@@ -680,42 +680,95 @@ print(sayHello("Anna"))
 
 
 
-* 每一个 function parameter 都有一个`argument label`和一个'parameter name`, 其中` argument label`
+* 每一个 function parameter 都有一个`argument label`和一个'parameter name`, 其中` argument label`是在调用函数时(写在实际的相应的argument 前面的); 而`parameter name` 则是用在 function 的 implementation 中使用. 默认地, parameters(形参) 使用` parameter name` 作为它们的`argument label`.
 
 ```Swift
 
 func someFunction(argument_Label localParameterName: Int) {
 
- //function body goes here, and can use localParameterName
+ // 这里是函数体, 可以使用 localParameterName 来引用实参的值
 
  // to refer to the argument value for that parameter
 
 }
 
-我们也可以不写argument_Label以"_"代替. 默认地, 
-
-If you do not want to use an extenal name for the second or subsequent parameters of a function, write an underscore(_) instead of an explicit external name for that parameter.
+我们也可以不写argument_Label以"_"代替, 这样函数调用时就不必在实际 argument 的值前些argument label 了.
 
 ```
 
-我们也可以给函数的参数在其定义中指定默认值.
+* 我们也可以给函数的参数在其定义中指定默认值. 有默认值的参数调用函数时是可以忽略掉的.
 
 ```Swift
 
-func someFunction(parameterWithDefault: Int = 12) {
+func someFunction(parameterWithoutDefault: Int, paramterWithDefault: Int = 12) {
 
- //function body goes here
-
- // if no arguments are passed to the function call,
-
- // value of parameterWithDefault is 12
+ // 如果调用此函数时你忽略了第二个参数, 那么在函数体内使用paramterWithDefault时它的默认值就是12.
 
  }
+ 
+ someFunction(parameterWithoutDefault: 3,  paremeterWithDefault: 6) // paremeterWithDefault的默认值是6
+ someFunction(parameterWithoutDefalut: 4) // parameterWithDefault is 12
 
+通常我们要把没有默认值的 parameter 放在有默认值的 parameter的前面. 因为没有默认值的 paramters 对 function 的定义来说更有辨识度.
  ```
+ 
+ * 可变参数
 
+ 我们可以在参数类型后插入`...`来指定此类型参数的个数可变.(这些参数在函数体内作为一个数组常量整体). 比如
+ 
+ ```Swift
+ 
+  func arithmeticMean(_ numbers: Double...) -> Double {
+  		var total: Double = 0
+  		for number in numbers {
+  			total += number
+  		}
+  		return total / Double(numbers.count)
+ }
+ arithmeticMean(1, 2, 3, 4, 5)
+ arithmeticMean(3, 8.25, 18.75)
+ ```
+ 
+ **注意** 一个 function 最多只能有一个可变参数.
+ 
+ #### In-Out parameters
+ 
+ * function 的 parameters 默认都是常量(可以理解为默认是值传递). 当然有默认就有"非默认"😂: 如果我们想修改 function 的某个参数的值(即改变了参数的"状态"), 并且希望在函数调用后, 此参数"被修改的状态"持续, 我们可以将此参数定义为"in-out parameter", 函数定义时以`in-out`关键字标识(放在类型前), 当然这样的参数肯定是变量(因为常量本身是不可变的, 这是之前我们都约好的呢). 在调用函数时,在变量前加`&`符号.
 
+**注意** `in-out`修饰的参数不能有默认值; 可变参数不能标记为`in-out`.
 
+例子:
+
+```Swift
+func swapTwoInts(_ a: inout Int, _ b: inout Int) {
+    let temporaryA = a
+    a = b
+    b = temporaryA
+}
+var someInt = 3
+var anotherInt = 107
+swapTwoInts(&someInt, &anotherInt)
+```
+* 概括: 与有返回值的函数不同, `in-out parameter` 是一种使得 function 可以对其函数体外的变量产生影响的方式.
+
+#### 函数类型
+
+* 函数是有类型的, 由 `parameter type` 和 `return type` 组成.
+
+比如 
+```Swift
+func addTwoInts(_ a: Int, _ b: Int) -> Int { return a + b }
+func multiplyTwoInts(_ a: Int, _ b: Int) -> Int { return a * b }
+```
+上述两个函数均是`(Int, Int) -> Int` 类型的函数:  两个参数值类型为 Int, 一个返回值类型为Int 的类型函数.
+
+所以在 Swift 中,我们就可以将函数类型像其他类型一样使用: Define a variable called `mathFunction`, which has a type of 'a function that takes two `Int` values, and returns an `Int` value.' Set this new variable to refer to the function called `addTwoInts.
+
+`var mathFunction: (Int, Int) -> Int = addTwoInts`
+
+#### 函数嵌套
+
+Swift 函数可以嵌套.
 
 
 * Function都是有返回值的, 只是不显式写的实际上是返回了一个Void类型(空tuple).
@@ -749,249 +802,6 @@ This behavior is known as copy-in copy-out or call by value result.
 
 
 **NOTE:** In-Out parameters cannot have default values, and variadic parameters cannot be marked as inout.
-
-
-
-####Closures
-
-
-
-* Global functions are closures that have a name and do not capture any values.
-
-* Nested functions are closures that have a name and can capture values from their enclosing function.
-
-* Closure expressions are unnamed closures written in a lightweight syntax that can capture values from their surrounding context.
-
-* Swift中closure的表达是简洁,清晰且鼓励在常见场景中使用语法糖;
-
- 1. 利用上下文推断参数和返回值类型
-
- 2. 隐式返回单表达式闭包,即单表达式闭包可以省略return关键字;
-
- 3. 参数名称简写;
-
- 4. Trailing closure syntax.
-
-* Closure Expressions:
-
- 1. 闭包表达式一般如下:
-
- ```Swift
-
- {(parameters) -> returnType in
-
- statements
-
- }
-
- 闭包函数体部分由关键字`in`引入,该关键字表示闭包的参数和返回值类型定义已经完成, 闭包函数体即将开始.
-
- ```
-
- 闭包表达式可以使用cons, var和inout类型作为参数,不能提供默认值(注意函数非inout参数是可以设置默认值的).也可以在参数列表的最后使用可变参数.元组也可以作为参数和返回值.
-
-
-
-* 单行表达式闭包可以通过省略return关键字来隐式返回单行表达式的结果.
-
-* Swift自动为内联闭包提供了参数名称缩写功能, 您可以直接通过$0, $1, $2来顺序调用闭包的参数,这样`in`关键字也同样可以被省略.
-
-* 运算符函数(Operator Functions): Swift内建对一些运算符进行了函数实现,因此运算符本省可以作为一个函数来使用.
-
-* Trailing Closures:将一个很长的闭包表达式作为最后一个参数传递给函数, 可以使用Trailing Closure来增加函数的可读性, 比如:
-
- ```Swift
-
- func someFunctionThatTakesAClosure(closure:() -> Void) {
-
- //函数体部分
-
- }
-
- //以下是不使用Trailing Closure进行的函数调用
-
- someFunctionThatTakesAClosure({
-
- //闭包主体部分
-
- })
-
- //以下是使用Trailing Closure进行函数调用
-
- someFunctionThatTakesAClosure(){
-
- //闭包主体部分
-
- }
-
- ```
-
-* Capturing Values: 闭包可以在其被定义的context中捕获cons或者var.
-
-* Closures Are Reference Types: functions and closures are reference types. Whenever you assign a function or a closure to a constant or avariable, you are actually setting that constant or variable to be a `regerence` to the function or closure.
-
-* A closure is said to escape a function when the closure is passed as an argument to the function, but is called after the function returns.
-
-
-
-* Autoclosures: An `autoclosure` is a closure that is auromatically created to wrap an expression that's being passed as an argument to a function. It does'n take any arguments, and when it's called, it return the value of the expressoin that's wrapped inside of it.
-
-
-
-####Enumerations
-
-
-
-Enumerations in Swift are first-class types in their own right. Each enumeration definition defines a brand new type. Like other types in Swift, their anmes should start with a capital letter. Give enumeration types singular rather than plural names, so that read as self-evident.
-
-
-
-You can define Swift enumerations to store associated values of any type, and the value types can be defferent for each case of the enumeratoin if needed. Enumerations similar to these are known as discriminated unions, tagged unions, or variants in other programming languages.
-
-
-
-
-
-####Classes and Structures
-
-
-
-Calsses and Structures are general-purpose, flexible constructs that become the buildig blocks of your program's code.
-
-
-
-Swift does not require you to create separate inserface and implementation files for custom classes and structures. In Swift, you define a class or a structure in a single file, and the external interface to that class or structure is automatically made avaliable for other code to use.
-
-
-
-Swift classes and structures are much closer in functionality than in other languages.
-
-
-
-Classes and Structures in Swift have many things in common.
-
-* Define properties to store values
-
-* Define methods to provide functionality
-
-* Define subscripts to provide access to their values using subscript syntax
-
-* Define initializers to set up their initial state
-
-* Be extended to expand their functionality beyond a default implementation
-
-* Conform to protocols to provide standard functionality of a certain kind
-
-
-
-Classes have additional capabilities that structures do not:
-
-* Inheritance enables one class to inherit the charactieristics of another.
-
-* Type casting enables you to check and interpret the type of class instance at runtime
-
-* Deinitializers enable an instance of a class to free up any resources it has assigned.
-
-* Reference counting allows more than one reference to a class instance.
-
-
-
-**NOTE:** Structures are always copied when they are passed around in your code, and do not use reference counting.
-
-
-
-Definition Syntax:
-
-```Swift
-
-class SomeClass {
-
- //class definition goes here
-
- }
-
-struct SomeStructure {
-
- // structure definition goes here
-
- }
-
- ```
-
-
-
-Class and Structure Instances:
-
-```Swift
-
-let someResolution = Resolution()
-
-let someVideoMode = VideoMode()
-
-```
-
-
-
-Accessing Properties
-
-
-
-You can access the properties of an instance using dot syntax. In dot Syntax, you write the property anme immediately after the instance name, separated by a period(.), without any spaces:
-
-```Swift
-
-print("The width of someResolution is \(someResolution.width)")
-
-```
-
-we can drill down into sub-properties, such as the width property in the resolution property of a VideoMode:
-
-```Swift
-
-print("The width of someVideoMode is \(someVideoMode.resolution.width)")
-
-```
-
-
-
-* All structures
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
