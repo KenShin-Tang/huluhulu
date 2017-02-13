@@ -1,18 +1,26 @@
 ####Initialization
 
-Initialization is the process of preparing an instance of a class, structure, or enumeration for use. This process involves setting an initial vaue for each stored property on that instance and performing any other setup or initialization that is required before the new instance is ready for use.
+Initialization就是class, structure, or enumeration用来做初始化的过程. 但是与 OC 不同的是, 它不返回值,而只是做初始化工作. 对应`initializer`, 我们也可以定义一个`deinitializer`
 
 我们使用`initializers`来创建一个特定类型的实例.
 
+### Setting Initial Values for Stored Properties
+
+Class 和 structure 必须在实例创建完成前对所有的 stored property 赋初值. 我们要么在 stored property 声明时就赋初值, 要么就在 initializer 中进行初始化.
+
+我们可以在 initializer 中为 stored property 设置初始值或者在 property 的定义中直接赋 default property value.
+
+> 注意: 当我们 在声明或者 initializer中给 stored property 赋初值时, 是直接设置的, 不会导致调用其 property observer 的.
+
 **Initializers**
 
-`Initializers` are called to create a new instance of a particular type. In its simplest form, an initializer is like an instance method with no parameters, written using the `init` keyword.
+`Initializers` 使用关键字 `init`来标识, 参数可有可无.
 
-**Local and External Parameter Names**
+### **Parameter Names and Argument Labels**
 
-Function 和 method中的参数, 初始化参数可以有 local name(for inner use)和 external name(for outer use).
+* 与 function 和 method 一样, initializer 的 parameters会有 parameter name for use in initializer's body and an argument label for use when calling the initializer.
 
-* External names must always be used in an initializer if they are defined, and omitting them is a compile-time error.(如果有external name,那么调用的时候必须写)
+* 由于 initializer 不会有明确的函数名, 所以 initializer 的 parameter 的 name 和 type 就扮演一个方法或函数"ID"的角色. 默认地, Swift 会为 initializer 的 parameter默认生成 argument label(当然我们也可以手动指定).
 
 **Optional Property Types**
 
@@ -22,7 +30,20 @@ Function 和 method中的参数, 初始化参数可以有 local name(for inner u
 
 > NOTE: For class instances, a constant property can be modified during initialization only by the class introduces it. It cannot be modified by subclass.
 
-**Memberwise Initializers for Structure Types**
+#### Default Initializer
+
+* 对于 class 和 structure, 只要对所有的 properties 都有初始值, 即使我们没有显式地提供 initializer, Swift 也会为我们默认地生成一个 default initializer.
+
+```Swift
+	class ShoppingListItem {
+		var name: String?
+		var quantity = 1
+		var purchased = false
+    }
+    var item = ShoppingListItem()
+```
+
+#### **Memberwise Initializers for Structure Types**
 
 Structure types automatically receive a `memberwise initializer` if they do not define any of their own custom initializers. Unlike a default initializer, the structure receives a memberwise initializer even if it has stored properties that do not have default values.
 
@@ -62,33 +83,46 @@ convenience init(parameters) {
 
 In first phase, each stored property is assigned an initial value by the class that introduced it. Once the initial state for every stored property has been determined, the second phase begins, and each class is given the opportunity to customize its stored properties further before the new instance is considered ready for use.
 
-Swift's compiler performs four helpful safety-checks to make sure that two-phase initialization is completed without error:
+Swift 的编译器会对初始化工作进行四方面的检查以确保初始化工作无误地完成. 
 
-*Safety check 1:* A designated initializer must ensure that all of the properties introduced by its class are initialized before it delegates up to a superclass initializer.
+* Safety check 1: Designated initializer  需确保在委托给父类之前自己引入的 property 都已初始化.
+	
+	As mentioned above, the memory for an object is only considered fully initialized once the initial state of all of its stored properties is known. In order for this rule to be satisfied, a designated initializer must make sure that all of its own properties are initialized before it hands off up the chain.
+	
+* Safety check 2: designated initializer在给继承来的property 赋值之前必须先委托父类做完初始化,否则(即在之后)继承来的 property赋的新值就会被其 superclass 的 initializer 覆盖重写.
+
+* Safety check 3: A conveninece initializer must delegate to another initializer before assigning a value to any property(including properties defined by the same class). If it doesn't, the new value the convenience initializer assigns will be overwritten by its own class's designated initializer.
+
+* Safety check 4: An initializer cannot call any instance methods. read the value of any instance properties, or refer to `self` as a value until after the first phase of initialization is complete.
 
 **Initializer Inheritance and Overriding**
 
-Unlike subclasses in Objective-C, Swift subclasses do not inherit their superclass initializers by default. Swift's approach prevents a situation in which a simple initializer from a superclass is inherited by a more specialized subclass and is used to create a new instance of the subclass that is not fully or correctly initialized.
+与 OC 不同, Swift 子类不会默认地继承父类的 initializer. 是为了防止父类的 initializer 不能正确地/不完整地 initialize 子类的实例.
 
 **Automatic Initializer Inheritance**
 
-As mentioned above, subclasses do not inherit their superclass initializers by default. However, superclass initializers are automatically inherited if  certain conditions are met.
+之前提到过, 子类默认不会继承父类的 initializer. 然而, 在特定情况下, 父类的 initializer 是会自动被子类继承的.
 
-Assuming that you provide default values for any new properties you introduce in a subclass, the following two rules apply:
+假定子类为每一个它自己引入的 property 设置了默认值, 那么下面两个准则就适用:
 
 **Rule 1**
 
-If your subclass doesn't define any designated initializers, it automatically inherits all of its superclass designated initializers.
+如果子类没有定义任何designated initializers, 那么它就自动继承父类的designated initializers.
 
 **Rule 2**
 
-If your subclass provides an implementation of all of its superclass designated initializers -- either by inheriting them as per rule 1, or by providing a custom implementation as part of its definition -- then it automatically inherits all of the superclass convenience initializers.
+如果子类实现了父类所有的 designted initailizers(即使是 子类中作为 convenience initializer).-- 要么是通过 rule1中所述方式实现或者在其定义中"实际"实现的.那么子类就默认继承所有的父类的 convenience initializer.
 
 
-**Failable Initializers**
+#### **Failable Initializers**
 
+* 使用`init?`标识此 initializer 为 failable.
 * You cannot define a failable and a nonfailable initializer with the same parameter types and names.
 * A failable initializer creates an `optional` value of the type it initializers. You write `return nil` within a failable initializer to indicate a point at which initialization failure can be triggered.
+
+> 注意: 严格来讲, initializer 是没有返回值的.它的职责就是确保`self`完全正确地初始化了. 我们`return nil` 是为了表明 a point at which initialization failure can be triggered, 成功的情况下是不需要 return "something" 来指明的.
+
+
 
 **Failable Initializers for Enumerations**
 
@@ -105,7 +139,7 @@ If your subclass provides an implementation of all of its superclass designated 
 
 **The init! Failable Initializer**
 
-我们定义一个failable initializer来创建一个optional的instance, 通常在`init`后标记一个`?`,即`init?`.
+我们定义一个failable initializer来创建一个optional的instance, 通常在`init`后标记一个`?`,即`init?`. 当然我们也可以创建一个
 
 
 **Required Initializers**
@@ -130,6 +164,8 @@ class SomeClass {
   return someValue
 }()
 ```
+注意: closure 末尾有一对圆括号, 这就是告诉 Swift 立即执行这个 closure. 如果没有这对括号, 我们则是要将整个 closure 本身赋值给这个 property, 而不是这个 closure 的返回值.
+> 当我们使用 closure初始化某一个 property 时, 这个实例其他内容还不确定是否已经初始化完成了, 所以我们还不能在 closure 中访问其他的 property, 即使有的property有默认值(但是为了保险, Swift 还是不允许访问). 即使是`self` 也不行.
 
 
 

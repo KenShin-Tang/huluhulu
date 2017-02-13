@@ -2,36 +2,49 @@
 
 **Modules and Source Files**
 
-Swift's access control model is based on the concept of modules and source files.
+Swift's 中的access control model 是基于 modules and source files概念上的.
 
-A `module` is a single unit of code distribution - a framework or application that is built and shipped as a single unit and that can be imported by another module with Swift's import keyword.
+A `module` 即一个独立的代码分发单元.比如一个独立编译的并可以由其他 module 导入的(import)framework 或者 application.
 
-A `source file` is a single Swift source code file within a module(in effect, a single file within an app or framework). Although it is common to define individual types in separate source files, a single source file can contain definitions for multiple types, functions, and so on.
+A `source file` 是一个 module( framework 或者 application) 中单独的 Swift 源代码文件. 一个源代码文件中可以定义一个或者多个 types, functions 等等.
 
-Swift中有三种级别的access level
-* Public access:任何导入其所在module的源文件都可以使用
-* Internal access: 只能在被所在的module中的代码使用
-* Private access: 只能在所在的source file的代码使用.
+Swift中对 entities有五种级别的access level
 
-Swift中的access levels遵循一个总的规则就是: 高级别的entity不能定义在低级别(更严格)的entity中:
-* 一个public variable 不能为internal或者private的类型,因为public的类型可以在任何地方调用而private的却不能.
-* 一个function不能比它的参数或者返回值的类型的access level还要高, because the function could be used in situation where its constituent types are not avaliable to the surrounding code.
+* `open` 和 `public` :entities所属的 module 以及任何导入其所属module的源文件都可以使用
+* `internal`: 只能在被所在的module中的代码使用;
+* `fileprivate`: 只能被其所属的 source file访问;
+* `private`: 只能在entity所在的声明范围内才可以使用.
+
+`Open` 是最宽松的access level, `private` 是最严格的(最低的)的 access level.
+
+`Open`只能用于 classes 以及 class members, 并且与` public` 有以下区别:
+
+* `public` 修饰的或者更严格的 access level 的 classes只能在其所属的 module 中被继承.
+* `public` 修饰的或者更严格的 access level 的 class members 只能在其所属的 module 中被 overriden.
+* `open` classes 则可以在其所属或者导入其所属的 module 中被继承.
+* `open` class memebers 则可以在其所属或者导入其所属的 module 中被 overriden.
+
+#### 定义 access level 的原则
+
+Swift中的access levels遵循一个总的规则就是: 高级别的entity不能定义在低级别(更严格)的entity中, 比如:
+* 一个`public`的变量不能为internal/private/file-private的类型,因为public的类型可以在任何地方调用而private的却不能.
+* 一个function不能比它的参数或者返回值的类型的access level还要高(更宽松), 因为这个 function 可能被用在其成分(比如参数)不可访问的情形.
 
 **Default Access Levels**
 
-All entities in your code(with a few specific exceptions, as described later in this chapter) have a default access level of internal if you do not specify an explicit access level yourself. As a result, in many cases you do not need to specify an explicit access level in your code.
+默认地, 所有的代码中的 entity 都是`internal` 级别的 access level.( 当然也有例外, 稍后讨论). 多数情况下我们无需特别设置entity 的 access level.
 
 **Access Levels for Single-Target Apps**
 
-When you writea simple single-target app, the code in your app is typically self-contained within the app and does not need to be made avaliable outside of the app's module. The default access level of internal already matches this requirement. Therefore, you do not need to specify a custom access level. You may, however, want to mark some parts of your code as private in order to hide their implemetation details from other code within the app's module.
+对于Single-target app,  app 的代码基本都是自包含在 app 中而不需要暴露给此module 外的. 默认的`internal` access level 已经满足了要求.因此没有必要额外设置一个 access level. 当然我们也可以使用` private` 在module中来隐藏一些实现细节.
 
 **Access Levels for Frameworks**
 
-When you develop a framework, mark the public-facing interface to that framework as public so that it can be viewed and accessed by other modules, such as an app that imports the framework. This public-facing is the application programming interface(or API) for the framework.
+ 开发Framwork 时通常将 public-facing interface 的 access level 设置为`public`或者`open`以便可以被其他 modules 访问. This public-facing is the application programming interface(or API) for the framework.
 
 **Access Levels for Unit Test Targets**
 
-When you write an app with a unit test target, the code in your app needs to be make available to that module in order to be tested. By default, only entities marked as public are accessible to other modules. However, a unit test target can access any internal entity, if you mark the import declaration for a product module with the `@testable` attribute and compile that product module with testing enabled.
+在进行单元测试时, 我们的代码需要对 unit test target module 可见. 默认地,只有` open` 和 `public` 的 entities 才可以被其他 modules 访问. 特别地,   只要我们在引入相应 module 对其标注为`@testable` 并compile that product module with testing enabled.
 
 **Access Control Syntax**
 
@@ -52,14 +65,14 @@ private func somePrivateFunction() {}
 
 **Tuple Types**
 
-tuple的access level是tuple中所有"元"中level最低的,即最restrictive的.
+tuple的access level是tuple中所有"元"中level最低的,即 most restrictive.
 > NOTE Tuple types do not have a standalone definition in the way that classes, structures, enumerations, and functions do. A tuple type's access level is deduced automatically when the suple type is used, and cannot be specified explicitly.
 
 **Function Types**
 
-类似地, function的access level是所有参数及返回值中最restrictive的那个级别.
+类似地, function的access level是所有参数及返回值中 most restrictive level.
 
-如果上下文(即默认的)function的access level与推断值(即所有参数及返回值中最restrictive的那个级别)不匹配,那么我们必须显式地指定.
+如果根据上下文默认的function的access level与推断值(即所有参数及返回值中 most restrictive level)不匹配,那么我们必须显式地指定.
 
 **Enumeration Types**
 
@@ -71,7 +84,7 @@ tuple的access level是tuple中所有"元"中level最低的,即最restrictive的
 
 **Subclassing**
 
-子类不能比父类的access level高. 然而我们可以override任何在特定的access context中可见的类成员(method, property,initializer, subcript). 这就意味着我们可以将父类中一个private的method在子类中override为internal的. 比如
+子类不能比父类的access level高. 但我们可以override任何在特定的access context中可见的类成员(method, property,initializer, subcript). 这就意味着我们可以将父类中一个private的method在子类中override为internal的. 比如
 ```Swift
 public class A {
   private func someMethod() {}

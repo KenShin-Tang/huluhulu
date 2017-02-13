@@ -15,13 +15,13 @@ An enueration declaration introduces a named enumeation type into your program. 
 * Protocol Declaration不能包含其他的declarations.
 
 * Declaration Modifiers: Declaration modifiers are keywords or context-sensitive keywords that modify the behavior or meaning of a declaration. 
-* `dynamic`: Apply this modifier to any member of a class that can be represented by Objective-C. When you mark a member declaration with the `dynamic` modifier, access to that member is always dynamically dispatched using the Objective-C runtime.
-* `final`: Apply this modifier to a class or to a property, method, or subscript member of a class. It's applied to a class to indicate that the class can't be subclassed. It's applied to a property, method, or subscript of a class to indicate that a class member can't be overridden in any subclass.
-* `lazy`: Apply this modifier to a stored varialbe property fo a class or structure to indicate that the property's initial value is calculaed and stored at most once, when the property is first accessed.
-* `optional`: Apply this modifier to a protocol's property, method, or subscript members to indicate that a conforming type isn't retuqired to implement those members. **You can apply the `optional` modifier only to protocols that are marked with the `objc` attribute. As a result, only class types can adopt and conform to a protocol that contains optional member requirements.**
-* `required`: Apply this modifier to a designated or convenience initializer of a class to indicate that every subclass must implement that initializer. The subclass's implementation of that initializer must also be marked with the required modifier.
+	* `dynamic`: Apply this modifier to any member of a class that can be represented by Objective-C. When you mark a member declaration with the `dynamic` modifier, access to that member is always dynamically dispatched using the Objective-C runtime.
+	* `final`: Apply this modifier to a class or to a property, method, or subscript member of a class. It's applied to a class to indicate that the class can't be subclassed. It's applied to a property, method, or subscript of a class to indicate that a class member can't be overridden in any subclass.
+	* `lazy`: Apply this modifier to a stored varialbe property fo a class or structure to indicate that the property's initial value is calculaed and stored at most once, when the property is first accessed.
+	* `optional`: Apply this modifier to a protocol's property, method, or subscript members to indicate that a conforming type isn't retuqired to implement those members. **You can apply the `optional` modifier only to protocols that are marked with the `objc` attribute. As a result, only class types can adopt and conform to a protocol that contains optional member requirements.**
+	* `required`: Apply this modifier to a designated or convenience initializer of a class to indicate that every subclass must implement that initializer. The subclass's implementation of that initializer must also be marked with the required modifier.
 
-* `weak`: The `weak` modifier is applied to a variable or a stored variable property to indicate that the variable or property has a weak reference to the object stored as its value. The type of the variable or property must be an optional class type. Use the `weak` modifier to avoid strong reference cycles. 
+	* `weak`: The `weak` modifier is applied to a variable or a stored variable property to indicate that the variable or property has a weak reference to the object stored as its value. The type of the variable or property must be an optional class type. Use the `weak` modifier to avoid strong reference cycles. 
 
 
 

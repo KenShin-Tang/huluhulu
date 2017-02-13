@@ -1,6 +1,6 @@
 ####Subcsipts
 
-Classes, structures, and enumerations can define`subscripts`, which are shortcuts for accessing the member elements of a collection, list, or sequence. You use subscripts to set and retrieve values by index without needing separate methods for setting and retrieval.
+Classes, structures, and enumerations 定义`subscripts`是一种简便访问集合类(比如 collection, list, sequence)成员的方式.can define`subscripts`. 我们可以利用 subscripts 来设置或获取成员的值而无需额外的方法来实现. 比如要访问一个`Array`中的元素, 我们就可以使用`someArray[index]`; 访问` Dictionary` 中的元素, 使用`someDictionary[key]`.
 
 **Subscript Syntax**
 
@@ -12,5 +12,5 @@ Susscripts are typically used as a shortcut for accessing the member elements in
 
 **Subscipt Options**
 
-Subscripts can take any number of input parameters, and these input parameters can be of any type. Subscripts can also return any type. Subscripts can use variable parameters and variadic parameters, but cannot use in-out parameters or provide default parameter values.
+Subscripts 可以有任意多个不同类型的参数同时也可以返回任意类型.  Subscripts 可以使用variadic parameters, 但是不能使用 in-out 参数以及有默认值的参数. 就说这么多吧.
 
