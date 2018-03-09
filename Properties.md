@@ -11,7 +11,7 @@
 
 **Stored Properties of Constant Structure Instances
 
-我们不能修改常量结构体类型的实例,即使此结构体中我们定义有var也不行,因为 constant的结构体本身是不能修改的.
+我们不能修改常量结构体类型的实例,即使此结构体中我们定义有var也不行,因为 constant的结构体本身是不能修改的(结构体是值类型).
 
 **Lazy Stored Properties
 

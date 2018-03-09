@@ -48,7 +48,7 @@ Swift中的access levels遵循一个总的规则就是: 高级别的entity不能
 
 **Access Control Syntax**
 
-```Swift
+```swift
 public class SomePublicClass {}
 internal class SomeInternalClass {} // Dafault,我们可以省略internal
 private class SomePrivateClass {}

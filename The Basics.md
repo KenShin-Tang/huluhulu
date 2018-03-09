@@ -7,7 +7,7 @@ Swift also introduces optional types, which handle the absence of a value. Optio
 
 ### Constants and Variables
 
-使用前先声明. `let` 声明 constants. `var` 声明 variables.
+使用前先声明. `let` 声明 constants, 关联的值不可变. `var` 声明 variables, 关联的值可变.
 
 
 ####注释
@@ -188,7 +188,7 @@ control statement. Unlike other programming languages, in Swift integers and str
 
 ####可选类型(Optionals)
 
-Optionals可以用在值可能确实的情况下: Optional表明一个未知的值或者根本没有值.我们可以近似理解为Objective-C中的nil, 但是nil只能指代objects,而不能指代structure, C基本类型,或枚举类型,这些情况OC中只能通过NSNotFound来指代. 这种方式是假定method的调用者知道要对其进行检测. 而Swift的optionals允许你使用它来指定任何类型为缺失值.
+Optionals可以用在值可能缺失的情况下. optional 代表两种 posibilities:  要么有值, 并且可以解包optional 来访问其值, 或者根本没有值.我们可以近似理解为Objective-C中的nil, 但是nil只能指代objects,而不能指代structure, C基本类型,或枚举类型,这些情况OC中只能通过`NSNotFound`来指代. 这种方式是假定method的调用者知道要对其进行检测. 而Swift的optionals允许你使用它来指定任何类型为缺失值.
 
 
 
@@ -236,7 +236,7 @@ if convetedNumber != nil {
 
 
 
-#可选绑定(Optional Binding) 即 `if/while let constantName = someOptional {}`
+#Optional Binding 即 `if/while let constantName = someOptional {}`
 
 我们使用`optional binding`来确认一个optional修饰的量是否有值,如果有, 那么它就可以做为一个临时常量或者变量. `Optional binding` 在if和while声明中来check一个optional修饰的量是否有值, 并且将其解包成一个常量或变量. 比如:
 
@@ -383,13 +383,19 @@ assert(age >= 0, "A person's age cannot be less than zero") //this cause the ass
 
 
 
- ####基本运算符
+ #### 基本运算符
 
 
 
 Swift支持大多数标准C的运算符并且提升了基本其中几个的避免常见编码错误的能力. 比如 赋值运算符 (=) 并不返回值, 这样就防止我们将 = 与 == 搞混用了. 算数运算符能够检测到并且防止值溢出. 与C不同, Swift中的 % 运算符能够计算小数. 并且Swift还提供了两种取数字区间的运算符..<(左闭右开)和...(闭区间).
 
+不像 C 中的赋值运算符`=`, Swift 中的赋值运算符自身不会返回值, 以下这样的 statement 是无效的(非法的):
 
+```
+if x = y {
+	// This is not valid, because x = y does not return a value
+}
+```
 
 在Swift中, 赋值运算符两侧要对齐(即a=b 或 a = b, 而不能是a =b). 与C和Objective-C不同的是, Swift的算数运算符不允许值溢出.
 
